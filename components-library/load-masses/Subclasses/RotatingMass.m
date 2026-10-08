@@ -13,22 +13,22 @@
 classdef RotatingMass < Mass
     
     properties
-        L1, theta_0, theta_f
+        L1, theta_0, theta_f, x_p
     end
     
     methods (Static)
         function parameters = parameters()
-            parameters = ["volume of load" "density" "L1" "L2" "theta initial" "theta final";
-                "0.01" "0" "0.001" "0.001" "0" "0";
-                "0" "0" "0" "0" "-1.57" "-1.57";
-                "Inf" "Inf" "Inf" "Inf" "1.57" "1.57"];
+            parameters = ["volume of load" "density" "L1" "L2" "theta initial" "theta final" "pivot x";
+                "0.01" "0" "0.001" "0.001" "0" "0" "0";
+                "0" "0" "0" "0" "-1.57" "-1.57" "-Inf";
+                "Inf" "Inf" "Inf" "Inf" "1.57" "1.57" "Inf"];
         end
     end
     
     methods
         
         % constructor
-        function obj = RotatingMass(V_load, density, L1, L2, theta_0, theta_f)
+        function obj = RotatingMass(V_load, density, L1, L2, theta_0, theta_f, x_p)
 
             % model
             EMA = L1/L2;
@@ -40,6 +40,7 @@ classdef RotatingMass < Mass
             obj.L1 = L1;
             obj.theta_0 = theta_0;
             obj.theta_f = theta_f;
+            obj.x_p = x_p;
         end 
     end
 end
