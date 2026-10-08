@@ -28,7 +28,7 @@ classdef RotatingMass < Mass
     methods
         
         % constructor
-        function obj = RotatingMass(V_load, density, L1, L2, theta_0, theta_f)
+        function obj = RotatingMass(V_load, density, L1, L2, theta_0, theta_f, x_p)
 
             % model
             EMA = L1/L2;

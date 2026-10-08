@@ -384,12 +384,13 @@ function mass = m_eff(load, spring, y0, y)
             y = 0;
         end
         L = spring.rest_length + y;
-        lambda = load.L1;
+        l_rest = spring.rest_length + abs(y0);
+        l_man = load.L1;
         theta_0 = load.theta_0;
         x_p = load.x_p;
-        y_p = sqrt((spring.rest_length-y0)^2 - (x_p-lambda*cos(theta_0)^2)) - lambda*sin(theta_0);
-        theta = asin((-y+y0+L1*sin(theta_0))/L1);
-        mass = mass/cos(theta) + 1E2*(abs(theta) > pi/2);
+        y_p = sqrt(l_rest^2 - (l_man*cos(theta_0)-x_p)^2) - l_man*sin(theta_0);
+        theta = L2theta(L, load, spring);
+        mass = mass * L ./ ( l_man^2 * (y_p*cos(theta) + x_p*sin(theta)) );
     end
 
     mass = mass + spring.mass/3;
@@ -403,17 +404,19 @@ function Force = F_eff(load, spring, y0, t, y)
 
     if isa(load, 'RotatingMass')
         
-        y1 = spring.rest_length + abs(y0);
-        y2 = spring.rest_length + abs(y(1));
+        L = spring.rest_length + y(1);
+        l_rest = spring.rest_length + abs(y0);
+        l_man = load.L1;
         theta_0 = load.theta_0;
-        L1 = load.L1;
+        x_p = load.x_p;
+        y_p = sqrt(l_rest^2 - (l_man*cos(theta_0)-x_p)^2) - l_man*sin(theta_0);
         m = load.mass;
         
-        theta = asin((-y(1)+y0+L1*sin(theta_0))/L1);
-        alpha = acos((y2^2-y1^2+2*y1*L1*sin(theta_0))/(2*y2*L1));
+        theta = L2theta(L, load, spring);
+        alpha = atan((x_p - l_man*cos(theta))/(y_p + l_man*sin(theta))) + pi/2 - theta;
         
-        Force = real( Force*sin(alpha) - abs(m*sin(theta)*y(2)^2/(L1*cos(theta)^3))) * (abs(theta) < pi/2);
-        Force = Force * (Force > 0);
+        Force = real( Force*sin(alpha) - ( l_man*(y_p*cos(theta)+x_p*sin(theta)).^2 + L^2*(y_p*sin(theta)-x_p*cos(theta)) ) / ( l_man^3*(y_p*cos(theta)+x_p*sin(theta).^3)*m*y(2)^2 ) );
+        Force = Force .* (Force > 0);
     end
 
 end
@@ -445,5 +448,37 @@ if (isa(spring, 'StandardLinearSolid2') || isa(spring, 'StandardLinearSolid')) &
 end
 
 status = 0;
+
+end
+
+
+%%% map theta to L
+function l = theta2L(theta, load, spring)
+
+    l_man = load.L1;
+    l_rest = spring.rest_length; % may be off by y0!
+    x_p = load.x_p;
+    theta_0 = load.theta_0;
+    y_p = sqrt(l_rest^2 - (l_man*cos(theta_0)-x_p)^2) - l_man*sin(theta_0);
+
+    l = sqrt( (l_man*cos(theta)-x_p).^2 + (l_man*sin(theta)+y_p).^2 );
+
+end
+
+%%% map L to theta
+function theta = L2theta(L, load, spring)
+
+    x_p = load.x_p;
+    theta_0 = load.theta_0;
+    theta_f = load.theta_f;
+    l_man = load.L1;
+    l_rest = spring.rest_length; % may be off by y0!
+    y_p = sqrt(l_rest^2 - (l_man*cos(theta_0)-x_p)^2) - l_man*sin(theta_0);
+
+    thetas = linspace(theta_0, theta_f, 1e6);
+    Ls = theta2L(thetas, load, spring);
+
+    index = find(Ls<=L, 1, 'last');
+    theta = thetas(index);
 
 end
