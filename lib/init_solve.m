@@ -25,6 +25,6 @@ function output = init_solve(lm, um, ld, lt, sp, x0, metric, DA_flag)
         [sol, trans_times] = solve_direct_actuation(loading_motor,load);
     end
     
-    cont = get_metrics(sol, trans_times, load, metric);
+    cont = get_metrics(sol, trans_times, load, metric, spring);
     output = cont(metric);
 end

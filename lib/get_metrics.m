@@ -1,4 +1,4 @@
-function metrics = get_metrics(sol, transition_times, load, met_names)
+function metrics = get_metrics(sol, transition_times, load, met_names, spring)
     % inputs:
     %   solution matrix with columns [time, position, velocity]
     %   and the effective mass (EMA)
@@ -10,6 +10,9 @@ function metrics = get_metrics(sol, transition_times, load, met_names)
     yend = sol(end,2);
     v_const = 1;
     KE_const = 0.5 .* m;
+    PE_const = 0.5 .* spring.k;
+
+    y_sol = sol(:,2);
 
     if isa(load, 'RotatingMass')
         % define angular terms
@@ -35,6 +38,14 @@ function metrics = get_metrics(sol, transition_times, load, met_names)
         metrics('y_takeoff') = yend;
     end
 
+    if isKey(metrics, 'PE_latch')
+        metrics('PE_latch') = PE_const .* y0.^2;
+    end
+
+    if isKey(metrics, 'PE_takeoff')
+        metrics('PE_takeoff') = PE_const .* yend.^2;
+    end
+
     if isKey(metrics, 't_unlatch')
         metrics('t_unlatch') = transition_times(1);
     end
@@ -53,6 +64,11 @@ function metrics = get_metrics(sol, transition_times, load, met_names)
     if isKey(metrics, 'KE_unlatch')
         index = find(sol(:,1)<=transition_times(1), 1, 'last');
         metrics('KE_unlatch') = KE_const .* sol(index, 3).^2;
+    end
+
+    if isKey(metrics, 'PE_unlatch')
+        index = find(sol(:,1)<=transition_times(1), 1, 'last');
+        metrics('PE_unlatch') = PE_const .* y_sol(index).^2; 
     end
 
     if isKey(metrics, 't_takeoff')

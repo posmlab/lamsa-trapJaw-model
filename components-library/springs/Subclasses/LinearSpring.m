@@ -8,7 +8,10 @@
 % min # arguments = 1
 
 classdef LinearSpring < Spring
-    
+    properties
+        k
+    end
+
     methods(Static)
         % the necessary parameters to make a LinearSpring
         function parameters = parameters()
@@ -51,6 +54,7 @@ classdef LinearSpring < Spring
             
             % call parent constructor
             obj = obj@Spring(Force, mass, range, rest_length);
+            obj.k = k;
         end
     end
 end
