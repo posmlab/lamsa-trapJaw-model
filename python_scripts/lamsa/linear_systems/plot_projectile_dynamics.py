@@ -4,8 +4,8 @@ import numpy as np
 from components.load import Mass
 from components.motor import LinearMotor
 from components.spring import Spring
-from solve_direct_actuation import solve_direct_actuation
-from solve_spring_actuation import solve_spring_actuation
+from python_scripts.lamsa.linear_systems.solve_direct_actuation import solve_direct_actuation
+from python_scripts.lamsa.linear_systems.solve_spring_actuation import solve_spring_actuation
 
 
 def launch_metrics(sol, mass):
