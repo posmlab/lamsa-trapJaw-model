@@ -5,7 +5,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from get_metrics import get_energy_metrics
+from python_scripts.energy_conservation.get_metrics import get_energy_metrics
 
 K, I, LAM, XP, L0, THETA0 = 2.0, 3.0, 0.5, 1.0, 2.0, 0.3
 YP = np.sqrt(L0**2 - (XP - LAM * np.cos(THETA0))**2) - LAM * np.sin(THETA0)

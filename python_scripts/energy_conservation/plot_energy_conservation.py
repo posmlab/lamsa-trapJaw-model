@@ -7,7 +7,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE / "tests"))
 
-from get_metrics import energy_conservation, get_energy_metrics
+from python_scripts.energy_conservation.get_metrics import energy_conservation, get_energy_metrics
 from test_energy_conservation import PARAMETER_SETS, simulate
 
 SPRING_COLOR = "#2a78d6"

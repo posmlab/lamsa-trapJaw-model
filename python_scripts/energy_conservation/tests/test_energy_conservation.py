@@ -6,7 +6,7 @@ import numpy as np
 from scipy.integrate import solve_ivp
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from get_metrics import energy_conservation, get_energy_metrics
+from python_scripts.energy_conservation.get_metrics import energy_conservation, get_energy_metrics
 
 #cols: x_p, lam, th0, L0, y0, k, I
 PARAMETER_SETS = [
