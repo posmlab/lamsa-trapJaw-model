@@ -1,9 +1,14 @@
+import sys
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-from components.load import Mass
-from components.motor import LinearMotor
-from components.spring import Spring
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+
+from python_scripts.lamsa.components.load import Mass
+from python_scripts.lamsa.components.motor import LinearMotor
+from python_scripts.lamsa.components.spring import Spring
 from python_scripts.lamsa.linear_systems.solve_direct_actuation import solve_direct_actuation
 from python_scripts.lamsa.linear_systems.solve_spring_actuation import solve_spring_actuation
 

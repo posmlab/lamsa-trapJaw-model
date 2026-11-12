@@ -2,13 +2,15 @@ import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 HERE = Path(__file__).resolve().parent
-sys.path.insert(0, str(HERE))
-sys.path.insert(0, str(HERE / "tests"))
+sys.path.insert(0, str(HERE.parents[1]))
 
 from python_scripts.energy_conservation.get_metrics import energy_conservation, get_energy_metrics
-from test_energy_conservation import PARAMETER_SETS, simulate
+from python_scripts.lamsa.components.load import RotatingMass
+from python_scripts.lamsa.components.spring import LinearSpring
+from python_scripts.lamsa.rotational_systems.solve_spring_actuation import solve_spring_actuation
 
 SPRING_COLOR = "#2a78d6"
 LOAD_COLOR = "#eb6834"
@@ -20,15 +22,26 @@ MS = 1e3
 MJ = 1e3
 
 
-def main(index=0):
+def main():
     """Plot PE and KE over time, and at latch, unlatch, takeoff, and close."""
-    xp, lam, th0, L0, y0, k, I = PARAMETER_SETS[index]
+    # x_p [m], lambda [m], theta_0 [rad], L_0 [m], y_0 [m], k [N/m], I [kg m^2]
+    xp, lam, th0, L0, y0, k, I = 0.010, 0.005, 0.3, 0.030, 0.002, 500.0, 1e-8
 
-    sol, theta, theta_dot = simulate(xp, lam, th0, L0, y0, k, I)
-    time = sol[:, 0]
-    y = sol[:, 1]
+    spring = LinearSpring(k, L0, y0)
+    load = RotatingMass(I, lam, xp, th0)
+
+    time, theta, omega = solve_spring_actuation(spring, load).T
+
+    pivot_y = np.sqrt(L0**2 - (xp - lam * np.cos(th0))**2) - lam * np.sin(th0)
+    length = np.hypot(xp - lam * np.cos(theta), pivot_y + lam * np.sin(theta))
+    alpha = np.arctan((xp - lam * np.cos(theta)) / (pivot_y + lam * np.sin(theta))) + np.pi / 2 - theta
+
+    y = length - L0 + y0
+    ydot = lam * np.sin(alpha) * omega
+    sol = np.c_[time, y, ydot]
+
     pe = 0.5 * k * y**2
-    ke = 0.5 * I * theta_dot**2
+    ke = 0.5 * I * omega**2
 
     takeoff = time[-1]
 
@@ -123,4 +136,4 @@ def main(index=0):
 
 
 if __name__ == "__main__":
-    main(int(sys.argv[1]) if len(sys.argv) > 1 else 0)
+    main()
